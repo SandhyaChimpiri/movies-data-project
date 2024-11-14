@@ -2,34 +2,29 @@ const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
 const cors = require("cors");
-const mysql = require("mysql");
+const mysql = require("mysql");  
 const bodyParser = require('body-parser');
+const util = require('node:util');
 const PORT = process.env.PORT || 5000;
 const app = express();
-const util = require('node:util');
-app.use(cors({ origin: '*' }));
+
+app.use(cors({ origin: 'http://localhost:3000' }));
 app.use(bodyParser.json());
 app.use(express.json());
-const dbConfig = require('./config/db.config.js');
 
 const db = mysql.createConnection({
-    host: dbConfig.host,
-    user: dbConfig.user,
-    password: dbConfig.password,
-    database: dbConfig.database,
-    port: dbConfig.port,
+    host: 'localhost',
+    user: 'root',
+    password: 'tiger',
+    database: 'movies_db'
 });
 
-app.get('/', (req,res)=>{
-    res.send("Yeah! It's Working");
-})
-
-db.connect((err)=>{
-    if(err) throw err;
-    console.log("MySQL Connected");
-})
-
 db.query = util.promisify(db.query);
+
+db.connect((err) => {
+    if (err) throw err;
+    console.log("MySQL connected");
+});
 
 app.get('/api/movies', async (req, res) => {
     try {
